@@ -42,12 +42,12 @@ function TopPerformers({ employees }) {
   )
 }
 
-function TeamTable({ employees, onAct }) {
+function TeamTable({ employees, onAct, title = 'Team Evaluations' }) {
   const { approve } = useStore()
   return (
     <Card>
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-bold">Team Evaluations</h2>
+        <h2 className="text-lg font-bold">{title}</h2>
         <Button variant="ghost" onClick={() => onAct.export()}>{Icon.download} Export</Button>
       </div>
       <div className="divide-y divide-slate-100 dark:divide-slate-700">
@@ -111,15 +111,44 @@ export function ManagerView({ view, config }) {
       )}
       {!isReports && (
         <div className="mb-6 flex items-center justify-between">
-          <h1 className="text-3xl font-extrabold tracking-tight">
-            {view === 'My Team' ? 'My Team' : view === 'Approvals' ? 'Approvals' : view === 'History' ? 'History' : 'Dashboard'}
-          </h1>
+          <h1 className="text-3xl font-extrabold tracking-tight">{view}</h1>
         </div>
       )}
 
-      {view === 'Approvals' ? (
-        <TeamTable employees={employees.filter((e) => e.status === 'Awaiting Approval' || e.status === 'Approved')} onAct={onAct} />
-      ) : (
+      {view === 'Approvals' && (
+        <TeamTable employees={employees.filter((e) => e.status === 'Awaiting Approval' || e.status === 'Approved')} onAct={onAct} title="Pending Approvals" />
+      )}
+
+      {view === 'My Evaluations' && (
+        <Card>
+          <h2 className="mb-1 text-lg font-bold">My Evaluations</h2>
+          <p className="mb-4 text-sm text-slate-400">Evaluations assigned to you this cycle.</p>
+          <div className="divide-y divide-slate-100 dark:divide-slate-700">
+            {employees.slice(0, 3).map((e) => (
+              <div key={e.id} className="flex items-center gap-4 py-4">
+                <Avatar initials={e.initials} color={e.color} />
+                <div className="w-44"><div className="font-semibold leading-tight">{e.name}</div><div className="text-xs text-slate-400">{e.dept} · {e.type}</div></div>
+                <Badge status={e.status} dot />
+                <div className="ml-auto flex items-center gap-4">
+                  <div className="hidden w-28 sm:block"><ProgressBar pct={e.progress} /></div>
+                  {e.rating && <Stars value={e.rating} />}
+                  <Button onClick={() => setEvalTarget(e)}>{Icon.play} {e.status === 'In Progress' ? 'Continue' : 'Start'}</Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      {view === 'My Team' && (
+        <TeamTable employees={employees} onAct={onAct} title="My Team" />
+      )}
+
+      {view === 'History' && (
+        <TeamTable employees={employees.filter((e) => ['Completed', 'Approved'].includes(e.status))} onAct={onAct} title="Evaluation History" />
+      )}
+
+      {(view === 'Dashboard' || isReports) && (
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2"><TeamTable employees={employees} onAct={onAct} /></div>
           <div className="space-y-6">
