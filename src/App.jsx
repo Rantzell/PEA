@@ -108,10 +108,14 @@ function Sidebar({ config, active, setActive, collapsed, setCollapsed }) {
   )
 }
 
-function TopHeader({ config, onHelp }) {
+function TopHeader({ config, onHelp, onToggleNav }) {
   const { role, setRole, dark, setDark, notify } = useStore()
   return (
     <header className="flex items-center gap-4 bg-ink px-6 py-3 text-white">
+      <button data-tour="menu" onClick={onToggleNav} title="Toggle navigation"
+        className="rounded-lg p-2 text-white/70 hover:bg-white/10 hover:text-white">
+        {Icon.menu}
+      </button>
       <Wordmark />
       <span className="ml-1 hidden text-lg font-medium text-white/90 md:inline">Performance Evaluation App</span>
       <div className="ml-auto flex items-center gap-3">
@@ -191,7 +195,7 @@ function Shell() {
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-slate-100 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
-      <TopHeader config={config} onHelp={tour.start} />
+      <TopHeader config={config} onHelp={tour.start} onToggleNav={() => setCollapsed((c) => !c)} />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar config={config} active={active} setActive={setActive} collapsed={collapsed} setCollapsed={setCollapsed} />
         <div className="flex flex-1 flex-col overflow-hidden">
