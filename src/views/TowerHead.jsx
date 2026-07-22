@@ -53,7 +53,7 @@ export function TowerHeadView({ view }) {
         <span className="flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1.5 text-xs font-bold text-amber-600">⚡ TOWER HEAD</span>
       </div>
 
-      <div className="mb-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div data-tour="stats" className="mb-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Approval Queue" value={queue.length} sub="Awaiting final sign-off" icon={Icon.check} tint="bg-red-100 text-brand" />
         <StatCard label="Approved This Cycle" value={approved} sub="Submitted to HR" icon={Icon.check} tint="bg-emerald-100 text-emerald-600" />
         <StatCard label="Rating Overrides" value={3} sub="Pending review" icon={Icon.sliders} tint="bg-amber-100 text-amber-600" />
@@ -61,7 +61,7 @@ export function TowerHeadView({ view }) {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-2" data-tour="main">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-bold">Approval Queue</h2>
             <span className="text-sm text-slate-400">{queue.length} pending</span>

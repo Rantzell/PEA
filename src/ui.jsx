@@ -54,9 +54,9 @@ export function Stars({ value }) {
   )
 }
 
-export function Card({ children, className = '' }) {
+export function Card({ children, className = '', ...props }) {
   return (
-    <div className={`rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800 ${className}`}>
+    <div className={`rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800 ${className}`} {...props}>
       {children}
     </div>
   )

@@ -150,8 +150,8 @@ export function ManagerView({ view, config }) {
 
       {(view === 'Dashboard' || isReports) && (
         <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2"><TeamTable employees={employees} onAct={onAct} /></div>
-          <div className="space-y-6">
+          <div className="lg:col-span-2" data-tour="main"><TeamTable employees={employees} onAct={onAct} /></div>
+          <div className="space-y-6" data-tour="stats">
             <DeptBars />
             <TopPerformers employees={employees} />
             <Card>

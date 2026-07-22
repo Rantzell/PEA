@@ -18,7 +18,7 @@ export function HRAdminView({ view }) {
 
   return (
     <>
-      <div className="mb-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div data-tour="stats" className="mb-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Published Questionnaires" value={publishedCount} sub="Active this cycle" icon={Icon.clipboard} tint="bg-emerald-100 text-emerald-600" />
         <StatCard label="Draft Questionnaires" value={draftCount} sub="Pending publish" icon={Icon.edit} tint="bg-amber-100 text-amber-600" />
         <StatCard label="Assignments Sent" value="156" sub="Across all departments" icon={Icon.send} tint="bg-indigo-100 text-indigo-600" />
@@ -26,7 +26,7 @@ export function HRAdminView({ view }) {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-2" data-tour="main">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-bold">Questionnaire Management</h2>
             <Button onClick={() => notify('New questionnaire draft created')}>{Icon.plus} New Questionnaire</Button>

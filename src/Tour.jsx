@@ -5,6 +5,8 @@ import React, { useState, useLayoutEffect, useEffect } from 'react'
 const STEPS = [
   { key: 'role', title: 'Switch your role', body: 'Everything in PEA is role-based. Use this switcher to move between Resource, Manager, Tower Head, HR Admin and System Admin.' },
   { key: 'nav', title: 'Navigate the app', body: 'The sidebar changes with your role. Each item opens a different workspace — dashboards, evaluations, approvals and reports.' },
+  { key: 'stats', title: 'Key metrics at a glance', body: 'These cards summarise the numbers that matter for your role — completion, ratings, sync health and more.' },
+  { key: 'main', title: 'Your main workspace', body: 'This is where the action happens: review evaluations, approve, override, publish or drill into records.' },
   { key: 'cta', title: 'Start something new', body: 'This action button starts a new evaluation, questionnaire or sync depending on your role.' },
   { key: 'search', title: 'Find anything fast', body: 'Search across employees, evaluations and questionnaires from here.' },
   { key: 'theme', title: 'Light & dark mode', body: 'Toggle a comfortable theme any time. Your choice is remembered.' },

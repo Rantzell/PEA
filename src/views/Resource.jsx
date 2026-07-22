@@ -92,9 +92,9 @@ export function ResourceView({ view, config, setView }) {
   return (
     <>
       <Header title="My Workspace" sub="Track your evaluations and direct reports in one place." badge="RESOURCE" tint={config.badgeTint} />
-      <WelcomeBanner />
+      <div data-tour="stats"><WelcomeBanner /></div>
       <div className="grid gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-2" data-tour="main">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-bold">My Evaluations</h2>
             <Button variant="ghost" onClick={() => setView('Direct Reports')}>↗ View All</Button>

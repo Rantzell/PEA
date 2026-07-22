@@ -220,13 +220,13 @@ export function SystemAdminView({ view }) {
           <span className={syncing ? 'animate-spin' : ''}>{Icon.refresh}</span> {syncing ? 'Syncing…' : 'Trigger Sync'}
         </Button>
       </div>
-      <div className="mb-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div data-tour="stats" className="mb-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="System Uptime" value="99.9%" sub="Last 30 days" icon={Icon.server} tint="bg-emerald-100 text-emerald-600" />
         <StatCard label="Sync Success Rate" value={`${okRate}%`} sub={`${runs.filter(r=>r.status==='OK').length} of ${runs.length} syncs OK`} icon={Icon.git} tint="bg-amber-100 text-amber-600" />
         <StatCard label="Active Sessions" value="48" sub="Right now" icon={Icon.users} tint="bg-indigo-100 text-indigo-600" />
         <StatCard label="Failed Syncs" value={failed} sub="Requires attention" icon={Icon.x} tint="bg-red-100 text-brand" />
       </div>
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div data-tour="main" className="grid gap-6 lg:grid-cols-2">
         <HealthCard />
         <SyncCard runs={runs} triggerSync={triggerSync} retry={retry} syncing={syncing} />
       </div>
