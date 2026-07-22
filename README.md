@@ -51,3 +51,16 @@ src/
 ```
 
 State is in-memory (seed data in `src/data.js`); no backend required.
+
+## Interactive user manual
+
+An in-app guided walkthrough (spotlight + **Next** steps) replaces a static PDF.
+It launches automatically on first visit and can be replayed any time from the
+**?** button in the header. Steps highlight the role switcher, sidebar, primary
+action, search, theme toggle and help button.
+
+## Branding
+
+Styled to match Seven Seven Global Services: black **SEVENSEVEN** header,
+breadcrumb bar, and a red branded footer with the logo, app version and
+copyright.
