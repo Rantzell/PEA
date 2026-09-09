@@ -108,8 +108,8 @@ export function ManagerView({ view, config }) {
           </div>
           <div className="mb-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             <StatCard label="Team Completion Rate" value={`${Math.round((started / employees.length) * 100)}%`} sub={`${started}/${employees.length} started`} icon={Icon.chart} tint="bg-emerald-100 text-emerald-600" />
-            <StatCard label="Pending Approvals" value={pendingApprovals} sub="Action required" icon={Icon.check} tint="bg-red-100 text-brand" />
             <StatCard label="Pending Direct Reports Evaluation" value={pendingDirectReports.length} sub="Awaiting your evaluation" icon={Icon.clipboard} tint="bg-amber-100 text-amber-600" />
+            <StatCard label="Pending Approvals" value={pendingApprovals} sub="Action required" icon={Icon.check} tint="bg-red-100 text-brand" />
             <StatCard label="Avg Team Rating" value={avg} sub="vs 3.9 last cycle" icon={Icon.chart} tint="bg-indigo-100 text-indigo-600" />
           </div>
         </>
