@@ -3,6 +3,7 @@ import { useStore } from '../store.jsx'
 import { Card, StatCard, Avatar, Stars, Button } from '../ui.jsx'
 import { Icon } from '../icons.jsx'
 import { deptCompletion } from '../data.js'
+import { exportReportsToExcel, exportReportsToPDF } from '../reportExport.js'
 
 const TOWER_HEAD_NAME = 'Juan Dela Cruz'
 
@@ -308,6 +309,22 @@ export function TowerHeadView({ view }) {
     Reports: ['Reports', 'Account/department performance and rating distribution.'],
   }[view] || [TOWER_HEAD_NAME, '']
 
+  const reportPayload = {
+    stats: [
+      { label: 'Approval Queue', value: queue.length, sub: 'Awaiting final sign-off' },
+      { label: 'Approved This Cycle', value: approvedPending, sub: 'Approved, not yet submitted to HR' },
+      { label: 'Submitted to HR', value: submittedToHR, sub: 'Sent to HR this cycle' },
+      { label: 'Rating Overrides', value: 3, sub: 'Pending review' },
+      { label: 'Avg Cycle Rating', value: avg, sub: 'Org-wide' },
+    ],
+    accounts: deptCompletion.map((d, i) => ({
+      name: `Account ${i + 1}`,
+      reviews: [4, 2, 1, 1, 1][i],
+      rating: [4.3, 4.6, 4.7, 2.8, 3.9][i],
+    })),
+    distribution: dist.map(([label, n]) => ({ label, count: n })),
+  }
+
   return (
     <>
       <div className="mb-6 flex items-start justify-between">
@@ -315,7 +332,15 @@ export function TowerHeadView({ view }) {
           <h1 className="text-3xl font-extrabold tracking-tight">{header[0]}</h1>
           <p className="mt-1 text-slate-500">{header[1]}</p>
         </div>
-        <span className="flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1.5 text-xs font-bold text-amber-600">⚡ TOWER HEAD</span>
+        <div className="flex items-center gap-2">
+          {view === 'Reports' && (
+            <>
+              <Button variant="outline" onClick={() => exportReportsToExcel(reportPayload)}>{Icon.download} Export Excel</Button>
+              <Button variant="outline" onClick={() => exportReportsToPDF(reportPayload)}>{Icon.download} Export PDF</Button>
+            </>
+          )}
+          <span className="flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1.5 text-xs font-bold text-amber-600">⚡ TOWER HEAD</span>
+        </div>
       </div>
 
       {view === 'Approval Queue' && <ApprovalQueue full />}
