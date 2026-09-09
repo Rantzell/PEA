@@ -145,7 +145,83 @@ function TopHeader({ config, onHelp, onToggleNav }) {
   )
 }
 
-function Breadcrumb({ section, view, config, notify }) {
+const YEAR_SUMMARIES = {
+  2026: { evaluations: 0, avgRating: '—', status: 'In Progress' },
+  2025: { evaluations: 13, avgRating: 4.0, status: 'Done' },
+}
+const CYCLE_YEARS = Object.keys(YEAR_SUMMARIES).map(Number)
+
+function CycleSelector() {
+  const [open, setOpen] = useState(false)
+  const [year, setYear] = useState(2026)
+  const summary = YEAR_SUMMARIES[year]
+  return (
+    <div className="relative">
+      <button onClick={() => setOpen((o) => !o)}
+        className="flex items-center gap-1.5 rounded-full bg-red-50 px-3 py-1 text-xs font-bold text-brand">
+        {year} <span className="text-[10px]">▾</span>
+      </button>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+          <div className="absolute right-0 z-50 mt-2 w-64 rounded-xl border border-slate-200 bg-white p-3 text-slate-900 shadow-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">
+            <div className="mb-3 rounded-lg bg-slate-50 p-3 dark:bg-slate-900/40">
+              <div className="text-xs font-bold uppercase tracking-wide text-slate-400">FY {year} Summary</div>
+              <div className="mt-1 flex items-center justify-between text-sm">
+                <span className="text-slate-500">Evaluations</span>
+                <span className="font-bold">{summary.evaluations}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-slate-500">Avg Rating</span>
+                <span className="font-bold">{summary.avgRating}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-slate-500">Status</span>
+                <span className="font-bold">{summary.status}</span>
+              </div>
+            </div>
+            <div className="space-y-1">
+              {CYCLE_YEARS.map((y) => (
+                <button key={y} onClick={() => { setYear(y); setOpen(false) }}
+                  className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-medium transition ${y === year ? 'bg-brand text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-700'}`}>
+                  <span>{y}</span>
+                  {y === year && <span>{Icon.check}</span>}
+                </button>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
+function CreateTeamModal({ onClose }) {
+  const { addTeam } = useStore()
+  const [name, setName] = useState('')
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
+      <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl dark:bg-slate-800" onClick={(e) => e.stopPropagation()}>
+        <h3 className="mb-1 text-lg font-bold">Create Team</h3>
+        <p className="mb-4 text-sm text-slate-400">Add a new team to the Tower Head console.</p>
+        <input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder="Team name"
+          className="mb-4 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand dark:border-slate-600 dark:bg-slate-900" />
+        <div className="flex gap-2">
+          <button onClick={onClose} className="flex-1 rounded-lg bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-200">Cancel</button>
+          <button
+            onClick={() => { if (name.trim()) { addTeam(name); onClose() } }}
+            className="flex-1 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark">
+            Create
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function Breadcrumb({ section, view, config, notify, role }) {
+  const [showCreateTeam, setShowCreateTeam] = useState(false)
+  const isTowerHead = role === 'Tower Head'
   return (
     <div className="flex items-center justify-between border-b border-slate-200 bg-white px-8 py-3 dark:border-slate-700 dark:bg-slate-900">
       <div className="flex items-center gap-2 text-sm">
@@ -154,12 +230,20 @@ function Breadcrumb({ section, view, config, notify }) {
         <span className="font-semibold text-slate-700 dark:text-slate-200">{view}</span>
       </div>
       <div className="flex items-center gap-3">
-        <span className="rounded-full bg-red-50 px-3 py-1 text-xs font-bold text-brand">{CYCLE}</span>
-        <button data-tour="cta" onClick={() => notify(`Started: ${config.cta}`)}
-          className="flex items-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark">
-          {Icon.plus}<span className="hidden sm:inline">{config.cta}</span>
-        </button>
+        {isTowerHead ? <CycleSelector /> : <span className="rounded-full bg-red-50 px-3 py-1 text-xs font-bold text-brand">{CYCLE}</span>}
+        {isTowerHead ? (
+          <button data-tour="cta" onClick={() => setShowCreateTeam(true)}
+            className="flex items-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark">
+            {Icon.users}<span className="hidden sm:inline">Create Team</span>
+          </button>
+        ) : (
+          <button data-tour="cta" onClick={() => notify(`Started: ${config.cta}`)}
+            className="flex items-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark">
+            {Icon.plus}<span className="hidden sm:inline">{config.cta}</span>
+          </button>
+        )}
       </div>
+      {showCreateTeam && <CreateTeamModal onClose={() => setShowCreateTeam(false)} />}
     </div>
   )
 }
@@ -199,7 +283,7 @@ function Shell() {
       <div className="flex flex-1 overflow-hidden">
         <Sidebar config={config} active={active} setActive={setActive} collapsed={collapsed} setCollapsed={setCollapsed} />
         <div className="flex flex-1 flex-col overflow-hidden">
-          <Breadcrumb view={view} config={config} notify={notify} />
+          <Breadcrumb view={view} config={config} notify={notify} role={role} />
           <main className="flex-1 overflow-y-auto p-8">
             <View view={view} config={config} setView={setView} />
           </main>

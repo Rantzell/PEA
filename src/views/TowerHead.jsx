@@ -6,7 +6,6 @@ import { deptCompletion } from '../data.js'
 
 const TOWER_HEAD_NAME = 'Juan Dela Cruz'
 
-const TOWERS = ['Application Development and Support', 'Infrastructure Maintenance and Support']
 const DEPT_TOWER = {
   Engineering: 'Application Development and Support',
   Design: 'Application Development and Support',
@@ -41,7 +40,7 @@ function OverrideModal({ employee, onClose }) {
 }
 
 export function TowerHeadView({ view }) {
-  const { employees, approve, reject, submitToHR } = useStore()
+  const { employees, approve, reject, submitToHR, teams } = useStore()
   const [overrideTarget, setOverrideTarget] = useState(null)
   const [checked, setChecked] = useState({})
   const [openTower, setOpenTower] = useState(null)
@@ -72,10 +71,9 @@ export function TowerHeadView({ view }) {
           <h2 className="text-lg font-bold">Approval Queue</h2>
           <span className="text-sm text-slate-400">{queue.length} pending</span>
         </div>
-        {queue.length === 0 && <p className="py-8 text-center text-slate-400">Queue is clear. 🎉</p>}
         <div className="grid gap-4 sm:grid-cols-2">
-          {TOWERS.filter((t) => groups[t]?.length).map((tower) => {
-            const members = groups[tower]
+          {teams.map((tower) => {
+            const members = groups[tower] || []
             return (
               <button
                 key={tower}
@@ -109,6 +107,7 @@ export function TowerHeadView({ view }) {
             <button onClick={onClose} className="text-slate-400 hover:text-slate-600">{Icon.x}</button>
           </div>
           <div className="max-h-[60vh] divide-y divide-slate-100 overflow-y-auto dark:divide-slate-700">
+            {members.length === 0 && <p className="py-8 text-center text-slate-400">No pending approvals in this team.</p>}
             {members.map((e) => (
               <div key={e.id} className="flex items-center gap-3 py-4">
                 <input type="checkbox" checked={!!checked[e.id]} onChange={() => setChecked((c) => ({ ...c, [e.id]: !c[e.id] }))} className="h-4 w-4 accent-brand" />
@@ -184,10 +183,9 @@ export function TowerHeadView({ view }) {
       <Card>
         <h2 className="mb-1 text-lg font-bold">Rating Overrides</h2>
         <p className="mb-4 text-sm text-slate-400">Adjust a final rating before it is submitted to HR.</p>
-        {rated.length === 0 && <p className="py-8 text-center text-slate-400">No rated evaluations yet.</p>}
         <div className="grid gap-4 sm:grid-cols-2">
-          {TOWERS.filter((t) => groups[t]?.length).map((tower) => {
-            const members = groups[tower]
+          {teams.map((tower) => {
+            const members = groups[tower] || []
             return (
               <button
                 key={tower}
@@ -221,6 +219,7 @@ export function TowerHeadView({ view }) {
             <button onClick={onClose} className="text-slate-400 hover:text-slate-600">{Icon.x}</button>
           </div>
           <div className="max-h-[60vh] divide-y divide-slate-100 overflow-y-auto dark:divide-slate-700">
+            {members.length === 0 && <p className="py-8 text-center text-slate-400">No rated evaluations in this team.</p>}
             {members.map((e) => (
               <div key={e.id} className="flex items-center gap-3 py-4">
                 <Avatar initials={e.initials} color={e.color} size={40} />

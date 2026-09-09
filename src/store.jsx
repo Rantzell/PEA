@@ -9,6 +9,7 @@ export function StoreProvider({ children }) {
   const [dark, setDark] = useState(() => localStorage.getItem('pea-dark') === '1')
   const [employees, setEmployees] = useState(initialEmployees)
   const [toast, setToast] = useState(null)
+  const [teams, setTeams] = useState(['Application Development and Support', 'Infrastructure Maintenance and Support'])
 
   useEffect(() => { localStorage.setItem('pea-role', role) }, [role])
   useEffect(() => {
@@ -50,11 +51,22 @@ export function StoreProvider({ children }) {
     setEmployees((list) => list.map((e) => (ids.includes(e.id) ? { ...e, submittedToHR: true } : e)))
     notify(`Submitted ${ids.length} evaluation${ids.length > 1 ? 's' : ''} to HR`)
   }
+  const addTeam = (name) => {
+    const trimmed = name.trim()
+    if (!trimmed) return
+    if (teams.some((t) => t.toLowerCase() === trimmed.toLowerCase())) {
+      notify(`Team "${trimmed}" already exists`)
+      return
+    }
+    setTeams((t) => [...t, trimmed])
+    notify(`Created team: ${trimmed}`)
+  }
 
   const value = {
     role, setRole, dark, setDark,
     employees, updateEmployee,
     approve, reject, override, saveEvaluation, submitToHR,
+    teams, addTeam,
     toast, notify,
   }
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>
