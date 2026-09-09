@@ -42,7 +42,7 @@ function TopPerformers({ employees }) {
   )
 }
 
-function TeamTable({ employees, onAct, title = 'Team Evaluations' }) {
+function TeamTable({ employees, onAct, title = 'Team Evaluations', emptyText = 'Nothing here right now.' }) {
   const { approve } = useStore()
   return (
     <Card>
@@ -51,6 +51,7 @@ function TeamTable({ employees, onAct, title = 'Team Evaluations' }) {
         <Button variant="ghost" onClick={() => onAct.export()}>{Icon.download} Export</Button>
       </div>
       <div className="divide-y divide-slate-100 dark:divide-slate-700">
+        {employees.length === 0 && <p className="py-8 text-center text-slate-400">{emptyText}</p>}
         {employees.map((e) => (
           <div key={e.id} className="flex items-center gap-4 py-4">
             <Avatar initials={e.initials} color={e.color} />
@@ -90,26 +91,30 @@ export function ManagerView({ view, config }) {
   const avg = rated.length ? (rated.reduce((a, b) => a + b.rating, 0) / rated.length).toFixed(1) : '—'
   const started = employees.filter((e) => e.progress > 0).length
 
+  const isDashboard = view === 'Dashboard'
+
   return (
     <>
-      {isReports && (
+      {(isDashboard || isReports) && (
         <>
           <div className="mb-6 flex items-start justify-between">
             <div>
               <h1 className="text-3xl font-extrabold tracking-tight">Manager Dashboard</h1>
-              <p className="mt-1 text-slate-500">Oversee your team's performance and drive completion.</p>
+              <p className="mt-1 text-slate-500">
+                {isReports ? 'Full breakdown of team completion and ratings.' : "Oversee your team's performance and drive completion."}
+              </p>
             </div>
             <span className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold ${config.badgeTint}`}>⚡ MANAGER</span>
           </div>
           <div className="mb-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            <StatCard label="Team Completion Rate" value="64%" sub={`${started}/10 started`} icon={Icon.chart} tint="bg-emerald-100 text-emerald-600" />
+            <StatCard label="Team Completion Rate" value={`${Math.round((started / employees.length) * 100)}%`} sub={`${started}/${employees.length} started`} icon={Icon.chart} tint="bg-emerald-100 text-emerald-600" />
             <StatCard label="Pending Approvals" value={pendingApprovals} sub="Action required" icon={Icon.check} tint="bg-red-100 text-brand" />
             <StatCard label="Overdue Reviews" value={overdue.length} sub={overdue[0]?.name || '—'} icon={Icon.history} tint="bg-amber-100 text-amber-600" />
             <StatCard label="Avg Team Rating" value={avg} sub="vs 3.9 last cycle" icon={Icon.chart} tint="bg-indigo-100 text-indigo-600" />
           </div>
         </>
       )}
-      {!isReports && (
+      {!isDashboard && !isReports && (
         <div className="mb-6 flex items-center justify-between">
           <h1 className="text-3xl font-extrabold tracking-tight">{view}</h1>
         </div>
@@ -148,15 +153,29 @@ export function ManagerView({ view, config }) {
         <TeamTable employees={employees.filter((e) => ['Completed', 'Approved'].includes(e.status))} onAct={onAct} title="Evaluation History" />
       )}
 
-      {(view === 'Dashboard' || isReports) && (
+      {isReports && (
         <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2" data-tour="main"><TeamTable employees={employees} onAct={onAct} /></div>
-          <div className="space-y-6" data-tour="stats">
+          <div className="lg:col-span-2"><TeamTable employees={employees} onAct={onAct} title="Full Team Report" /></div>
+          <div className="space-y-6">
             <DeptBars />
             <TopPerformers employees={employees} />
+          </div>
+        </div>
+      )}
+
+      {isDashboard && (
+        <div className="grid gap-6 lg:grid-cols-3">
+          <div className="space-y-6 lg:col-span-2" data-tour="main">
+            <TeamTable
+              employees={employees.filter((e) => e.status === 'Awaiting Approval')}
+              onAct={onAct}
+              title="Pending Approvals"
+              emptyText="No approvals waiting — nice work."
+            />
             <Card>
               <h2 className="mb-4 text-lg font-bold">Needs Your Attention</h2>
               <div className="space-y-3">
+                {attention.length === 0 && <p className="py-4 text-center text-slate-400">Nothing needs attention right now.</p>}
                 {attention.map((e) => (
                   <div key={e.id} className="flex items-center gap-3 rounded-xl bg-slate-50 p-3 dark:bg-slate-700/40">
                     <Avatar initials={e.initials} color={e.color} size={36} />
@@ -166,6 +185,10 @@ export function ManagerView({ view, config }) {
                 ))}
               </div>
             </Card>
+          </div>
+          <div className="space-y-6" data-tour="stats">
+            <DeptBars />
+            <TopPerformers employees={employees} />
           </div>
         </div>
       )}
