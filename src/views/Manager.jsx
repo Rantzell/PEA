@@ -17,23 +17,61 @@ function groupByAccount(employees) {
 
 const ACCOUNT_COLORS = ['#6366f1', '#ec4899', '#f59e0b', '#c8102e', '#10b981', '#0ea5e9', '#8b5cf6', '#14b8a6', '#f97316']
 
-function AccountCardGrid({ title, employees, emptyText, onOpen }) {
+function AccountDonut({ groups, accounts }) {
+  const total = accounts.reduce((a, acc) => a + groups[acc].length, 0) || 1
+  let cumulative = 0
+  const stops = accounts.map((acc, i) => {
+    const color = ACCOUNT_COLORS[i % ACCOUNT_COLORS.length]
+    const start = (cumulative / total) * 360
+    cumulative += groups[acc].length
+    const end = (cumulative / total) * 360
+    return `${color} ${start}deg ${end}deg`
+  }).join(', ')
+  return (
+    <div className="mb-5 flex flex-col items-center gap-5 border-b border-slate-100 pb-5 dark:border-slate-700 sm:flex-row">
+      <div className="relative h-28 w-28 shrink-0 rounded-full" style={{ background: `conic-gradient(${stops})` }}>
+        <div className="absolute inset-2.5 flex flex-col items-center justify-center rounded-full bg-white dark:bg-slate-800">
+          <div className="text-xl font-extrabold">{total}</div>
+          <div className="text-[10px] text-slate-400">total</div>
+        </div>
+      </div>
+      <div className="grid flex-1 grid-cols-2 gap-x-4 gap-y-1.5 text-sm">
+        {accounts.map((acc, i) => (
+          <div key={acc} className="flex items-center gap-2">
+            <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: ACCOUNT_COLORS[i % ACCOUNT_COLORS.length] }} />
+            <span className="truncate text-slate-600 dark:text-slate-300">{acc}</span>
+            <span className="ml-auto font-semibold">{groups[acc].length}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function AccountCardGrid({ title, employees, emptyText, tint, onOpen }) {
   const groups = groupByAccount(employees)
   const accounts = Object.keys(groups).sort()
   return (
     <Card>
-      <h2 className="mb-4 text-lg font-bold">{title}</h2>
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-lg font-bold">{title}</h2>
+        <span className="text-sm text-slate-400">{employees.length} total</span>
+      </div>
       {accounts.length === 0 && <p className="py-8 text-center text-slate-400">{emptyText}</p>}
-      <div className="space-y-1">
-        {accounts.map((account, i) => (
+      {accounts.length > 0 && <AccountDonut groups={groups} accounts={accounts} />}
+      <div className="grid gap-4 sm:grid-cols-2">
+        {accounts.map((account) => (
           <button
             key={account}
             onClick={() => onOpen(account)}
-            className="flex w-full items-center gap-3 rounded-lg px-2 py-2.5 text-left text-sm transition hover:bg-slate-50 dark:hover:bg-slate-700/40"
+            className="rounded-xl border border-slate-100 p-5 text-left transition hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-lg dark:border-slate-700"
           >
-            <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: ACCOUNT_COLORS[i % ACCOUNT_COLORS.length] }} />
-            <span className="font-medium">{account}</span>
-            <span className="ml-auto text-slate-400">{groups[account].length} pending</span>
+            <div className={`mb-3 flex h-10 w-10 items-center justify-center rounded-lg ${tint}`}>{Icon.users}</div>
+            <div className="font-bold leading-snug">{account}</div>
+            <div className="mt-3 flex items-end justify-between">
+              <span className="text-2xl font-extrabold">{groups[account].length}</span>
+              <span className="text-sm text-slate-400">pending</span>
+            </div>
           </button>
         ))}
       </div>
@@ -267,12 +305,14 @@ export function ManagerView({ view, config }) {
               title="Pending Direct Reports per Account"
               employees={pendingDirectReports}
               emptyText="No direct reports pending evaluation — nice work."
+              tint="bg-amber-50 text-amber-600 dark:bg-amber-900/20"
               onOpen={setOpenDirectAccount}
             />
             <AccountCardGrid
               title="Pending Approvals per Account"
               employees={pendingApprovalsList}
               emptyText="No approvals waiting — nice work."
+              tint="bg-red-50 text-brand dark:bg-red-900/20"
               onOpen={setOpenApprovalAccount}
             />
             <Card>
