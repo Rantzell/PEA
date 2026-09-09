@@ -15,6 +15,39 @@ function groupByAccount(employees) {
   }, {})
 }
 
+const ACCOUNT_COLORS = ['#6366f1', '#ec4899', '#f59e0b', '#c8102e', '#10b981', '#0ea5e9', '#8b5cf6', '#14b8a6', '#f97316']
+
+function AccountDonut({ groups, accounts }) {
+  const total = accounts.reduce((a, acc) => a + groups[acc].length, 0) || 1
+  let cumulative = 0
+  const stops = accounts.map((acc, i) => {
+    const color = ACCOUNT_COLORS[i % ACCOUNT_COLORS.length]
+    const start = (cumulative / total) * 360
+    cumulative += groups[acc].length
+    const end = (cumulative / total) * 360
+    return `${color} ${start}deg ${end}deg`
+  }).join(', ')
+  return (
+    <div className="mb-5 flex flex-col items-center gap-5 border-b border-slate-100 pb-5 dark:border-slate-700 sm:flex-row">
+      <div className="relative h-28 w-28 shrink-0 rounded-full" style={{ background: `conic-gradient(${stops})` }}>
+        <div className="absolute inset-2.5 flex flex-col items-center justify-center rounded-full bg-white dark:bg-slate-800">
+          <div className="text-xl font-extrabold">{total}</div>
+          <div className="text-[10px] text-slate-400">total</div>
+        </div>
+      </div>
+      <div className="grid flex-1 grid-cols-2 gap-x-4 gap-y-1.5 text-sm">
+        {accounts.map((acc, i) => (
+          <div key={acc} className="flex items-center gap-2">
+            <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: ACCOUNT_COLORS[i % ACCOUNT_COLORS.length] }} />
+            <span className="truncate text-slate-600 dark:text-slate-300">{acc}</span>
+            <span className="ml-auto font-semibold">{groups[acc].length}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 function AccountCardGrid({ title, employees, emptyText, tint, onOpen }) {
   const groups = groupByAccount(employees)
   const accounts = Object.keys(groups).sort()
@@ -25,6 +58,7 @@ function AccountCardGrid({ title, employees, emptyText, tint, onOpen }) {
         <span className="text-sm text-slate-400">{employees.length} total</span>
       </div>
       {accounts.length === 0 && <p className="py-8 text-center text-slate-400">{emptyText}</p>}
+      {accounts.length > 0 && <AccountDonut groups={groups} accounts={accounts} />}
       <div className="grid gap-4 sm:grid-cols-2">
         {accounts.map((account) => (
           <button
