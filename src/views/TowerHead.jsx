@@ -145,7 +145,7 @@ export function TowerHeadView({ view }) {
     </Card>
   )
 
-  const HRSubmission = () => (
+  const HRSubmission = ({ full }) => (
     <Card>
       <h2 className="mb-4 text-lg font-bold">HR Submission</h2>
       <div className="rounded-xl bg-emerald-50 p-4 dark:bg-emerald-900/20">
@@ -153,7 +153,7 @@ export function TowerHeadView({ view }) {
         <div className="my-1 text-3xl font-extrabold">{approvedPending}</div>
         <div className="text-sm text-slate-500">approved, not yet submitted to HR</div>
       </div>
-      {approvedList.length > 0 && (
+      {full && approvedList.length > 0 && (
         <div className="mt-4 max-h-64 divide-y divide-slate-100 overflow-y-auto rounded-xl border border-slate-100 dark:divide-slate-700 dark:border-slate-700">
           {approvedList.map((e) => (
             <div key={e.id} className="flex items-center gap-3 px-3 py-3">
@@ -268,7 +268,7 @@ export function TowerHeadView({ view }) {
       {view === 'Approval Queue' && <ApprovalQueue full />}
       {view === 'Rating Overrides' && <OverridesPage />}
       {view === 'HR Submission' && (
-        <div className="grid gap-6 lg:grid-cols-2"><HRSubmission /><Distribution /></div>
+        <div className="grid gap-6 lg:grid-cols-2"><HRSubmission full /><Distribution /></div>
       )}
       {view === 'Reports' && (
         <>
