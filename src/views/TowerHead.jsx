@@ -130,7 +130,7 @@ export function TowerHeadView({ view }) {
 
   const DeptPerformance = () => (
     <Card>
-      <h2 className="mb-4 text-lg font-bold">Account Performance</h2>
+      <h2 className="mb-4 text-lg font-bold">Account / Department Performance</h2>
       <div className="space-y-3">
         {deptCompletion.map((d, i) => (
           <div key={d.dept} className="flex items-center gap-3 text-sm">
@@ -240,7 +240,7 @@ export function TowerHeadView({ view }) {
     'Approval Queue': ['Approval Queue', 'Give final sign-off on submitted evaluations.'],
     'Rating Overrides': ['Rating Overrides', 'Override final ratings before HR submission.'],
     'HR Submission': ['HR Submission', 'Send approved evaluations to Human Resources.'],
-    Reports: ['Reports', 'Account performance and rating distribution.'],
+    Reports: ['Reports', 'Account/department performance and rating distribution.'],
   }[view] || [TOWER_HEAD_NAME, '']
 
   return (
