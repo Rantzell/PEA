@@ -52,10 +52,11 @@ export function TowerHeadView({ view }) {
   const avg = rated.length ? (rated.reduce((a, b) => a + b.rating, 0) / rated.length).toFixed(1) : '—'
 
   const dist = [
-    ['Outstanding (5.0)', rated.filter((e) => e.rating >= 5).length + 2, '#10b981'],
-    ['Excellent (4-4.9)', rated.filter((e) => e.rating >= 4 && e.rating < 5).length + 5, '#6366f1'],
-    ['Good (3-3.9)', rated.filter((e) => e.rating >= 3 && e.rating < 4).length + 1, '#f59e0b'],
-    ['Needs Impr. (<3)', rated.filter((e) => e.rating < 3).length, '#c8102e'],
+    ['Exceptional', rated.filter((e) => e.rating >= 4.5).length + 2, '#10b981'],
+    ['Exceeds Expectation', rated.filter((e) => e.rating >= 4 && e.rating < 4.5).length + 3, '#6366f1'],
+    ['Meets Expectation', rated.filter((e) => e.rating >= 3 && e.rating < 4).length + 3, '#f59e0b'],
+    ['Needs Improvement', rated.filter((e) => e.rating >= 2 && e.rating < 3).length + 1, '#f97316'],
+    ['Unsatisfactory', rated.filter((e) => e.rating < 2).length, '#c8102e'],
   ]
 
   const ApprovalQueue = ({ full }) => {
@@ -129,12 +130,12 @@ export function TowerHeadView({ view }) {
 
   const DeptPerformance = () => (
     <Card>
-      <h2 className="mb-4 text-lg font-bold">Department Performance</h2>
+      <h2 className="mb-4 text-lg font-bold">Account Performance</h2>
       <div className="space-y-3">
         {deptCompletion.map((d, i) => (
           <div key={d.dept} className="flex items-center gap-3 text-sm">
             <span className="h-2.5 w-2.5 rounded-full" style={{ background: d.color }} />
-            <span className="font-medium">{d.dept}</span>
+            <span className="font-medium">Account {i + 1}</span>
             <span className="ml-auto text-slate-400">{[4, 2, 1, 1, 1][i]} reviews</span>
             <span className="w-8 font-bold">{[4.3, 4.6, 4.7, 2.8, 3.9][i]}</span>
           </div>
@@ -239,7 +240,7 @@ export function TowerHeadView({ view }) {
     'Approval Queue': ['Approval Queue', 'Give final sign-off on submitted evaluations.'],
     'Rating Overrides': ['Rating Overrides', 'Override final ratings before HR submission.'],
     'HR Submission': ['HR Submission', 'Send approved evaluations to Human Resources.'],
-    Reports: ['Reports', 'Department performance and rating distribution.'],
+    Reports: ['Reports', 'Account performance and rating distribution.'],
   }[view] || [TOWER_HEAD_NAME, '']
 
   return (
@@ -281,7 +282,7 @@ export function TowerHeadView({ view }) {
           </div>
           <div className="grid gap-6 lg:grid-cols-3">
             <ApprovalQueue />
-            <div className="space-y-6"><DeptPerformance /><HRSubmission /><Distribution /></div>
+            <div className="space-y-6"><HRSubmission /><DeptPerformance /><Distribution /></div>
           </div>
         </>
       )}
