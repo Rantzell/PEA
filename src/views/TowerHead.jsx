@@ -98,6 +98,23 @@ export function TowerHeadView({ view }) {
 
   const TowerModal = ({ tower, onClose }) => {
     const members = queue.filter((e) => (DEPT_TOWER[e.dept] || e.dept) === tower)
+    const selectedIds = members.filter((e) => checked[e.id]).map((e) => e.id)
+    const allSelected = members.length > 0 && selectedIds.length === members.length
+    const toggleAll = () => {
+      setChecked((c) => {
+        const next = { ...c }
+        members.forEach((e) => { next[e.id] = !allSelected })
+        return next
+      })
+    }
+    const approveSelected = () => {
+      selectedIds.forEach((id) => approve(id))
+      setChecked((c) => {
+        const next = { ...c }
+        selectedIds.forEach((id) => { delete next[id] })
+        return next
+      })
+    }
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
         <div className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl dark:bg-slate-800" onClick={(e) => e.stopPropagation()}>
@@ -108,6 +125,17 @@ export function TowerHeadView({ view }) {
             </div>
             <button onClick={onClose} className="text-slate-400 hover:text-slate-600">{Icon.x}</button>
           </div>
+          {members.length > 0 && (
+            <div className="mb-2 flex items-center justify-between border-b border-slate-100 pb-2 dark:border-slate-700">
+              <label className="flex items-center gap-2 text-sm font-medium text-slate-500">
+                <input type="checkbox" checked={allSelected} onChange={toggleAll} className="h-4 w-4 accent-brand" />
+                Select all
+              </label>
+              {selectedIds.length > 0 && (
+                <Button variant="green" onClick={approveSelected}>{Icon.thumb} Approve {selectedIds.length} Selected</Button>
+              )}
+            </div>
+          )}
           <div className="max-h-[60vh] divide-y divide-slate-100 overflow-y-auto dark:divide-slate-700">
             {members.length === 0 && <p className="py-8 text-center text-slate-400">No pending approvals in this team.</p>}
             {members.map((e) => (
