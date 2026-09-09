@@ -238,6 +238,96 @@ export function TowerHeadView({ view }) {
     </Card>
   )
 
+  // Reports-only components: a report should read differently from the live dashboard
+  const ReportsSummary = () => (
+    <div className="mb-6 overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-amber-900 p-6 text-white shadow-lg sm:p-8">
+      <div className="text-xs font-bold uppercase tracking-widest text-amber-300/80">Cycle Summary</div>
+      <div className="mt-1 text-2xl font-extrabold">Tower-wide standing</div>
+      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-5">
+        {reportPayload.stats.map((s) => (
+          <div key={s.label} className="rounded-xl bg-white/10 px-4 py-3 backdrop-blur-sm">
+            <div className="text-2xl font-extrabold">{s.value}</div>
+            <div className="mt-1 text-xs leading-snug text-white/70">{s.label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+
+  const ReportsAccountTable = () => (
+    <Card>
+      <h2 className="mb-4 text-lg font-bold">Account / Department Performance</h2>
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="border-b border-slate-200 text-left text-xs font-bold uppercase tracking-wide text-slate-400 dark:border-slate-700">
+            <th className="pb-2">Account</th>
+            <th className="pb-2">Reviews</th>
+            <th className="pb-2 text-right">Avg Rating</th>
+          </tr>
+        </thead>
+        <tbody>
+          {deptCompletion.map((d, i) => {
+            const reviews = [4, 2, 1, 1, 1][i]
+            const rating = [4.3, 4.6, 4.7, 2.8, 3.9][i]
+            return (
+              <tr key={d.dept} className="border-b border-slate-50 last:border-0 dark:border-slate-800">
+                <td className="py-3">
+                  <div className="flex items-center gap-2">
+                    <span className="h-2.5 w-2.5 rounded-full" style={{ background: d.color }} />
+                    <span className="font-medium">Account {i + 1}</span>
+                  </div>
+                </td>
+                <td className="py-3 text-slate-500">{reviews}</td>
+                <td className="py-3">
+                  <div className="flex items-center justify-end gap-2">
+                    <div className="h-1.5 w-20 rounded-full bg-slate-100 dark:bg-slate-700">
+                      <div className="h-1.5 rounded-full" style={{ width: `${(rating / 5) * 100}%`, background: d.color }} />
+                    </div>
+                    <span className="w-8 text-right font-bold">{rating}</span>
+                  </div>
+                </td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
+    </Card>
+  )
+
+  const ReportsDistributionDonut = () => {
+    const total = dist.reduce((a, [, n]) => a + n, 0) || 1
+    let cumulative = 0
+    const stops = dist.map(([, n, color]) => {
+      const start = (cumulative / total) * 360
+      cumulative += n
+      const end = (cumulative / total) * 360
+      return `${color} ${start}deg ${end}deg`
+    }).join(', ')
+    return (
+      <Card>
+        <h2 className="mb-4 text-lg font-bold">Evaluation Distribution</h2>
+        <div className="flex flex-col items-center gap-6 sm:flex-row">
+          <div className="relative h-36 w-36 shrink-0 rounded-full" style={{ background: `conic-gradient(${stops})` }}>
+            <div className="absolute inset-3 flex flex-col items-center justify-center rounded-full bg-white dark:bg-slate-800">
+              <div className="text-2xl font-extrabold">{total}</div>
+              <div className="text-xs text-slate-400">rated</div>
+            </div>
+          </div>
+          <div className="w-full space-y-2">
+            {dist.map(([label, n, color]) => (
+              <div key={label} className="flex items-center gap-2 text-sm">
+                <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: color }} />
+                <span className="font-medium">{label}</span>
+                <span className="ml-auto font-bold">{n}</span>
+                <span className="w-10 text-right text-xs text-slate-400">{Math.round((n / total) * 100)}%</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Card>
+    )
+  }
+
   // Rating Overrides page: every rated evaluation, each with an Override action
   const OverridesPage = () => {
     const groups = rated.reduce((acc, e) => {
@@ -350,14 +440,8 @@ export function TowerHeadView({ view }) {
       )}
       {view === 'Reports' && (
         <>
-          <div data-tour="stats" className="mb-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
-            <StatCard label="Approval Queue" value={queue.length} sub="Awaiting final sign-off" icon={Icon.check} tint="bg-red-100 text-brand" />
-            <StatCard label="Approved This Cycle" value={approvedPending} sub="Approved, not yet submitted to HR" icon={Icon.check} tint="bg-emerald-100 text-emerald-600" />
-            <StatCard label="Submitted to HR" value={submittedToHR} sub="Sent to HR this cycle" icon={Icon.send} tint="bg-sky-100 text-sky-600" />
-            <StatCard label="Rating Overrides" value={3} sub="Pending review" icon={Icon.sliders} tint="bg-amber-100 text-amber-600" />
-            <StatCard label="Avg Cycle Rating" value={avg} sub="Org-wide" icon={Icon.chart} tint="bg-indigo-100 text-indigo-600" />
-          </div>
-          <div className="grid gap-6 lg:grid-cols-2"><DeptPerformance /><Distribution /></div>
+          <ReportsSummary />
+          <div className="grid gap-6 lg:grid-cols-2"><ReportsAccountTable /><ReportsDistributionDonut /></div>
         </>
       )}
 
