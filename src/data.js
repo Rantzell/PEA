@@ -3,6 +3,17 @@ export const ROLES = ['Resource', 'Manager', 'Tower Head', 'HR Admin', 'System A
 
 export const CYCLE = 'Q4 2025'
 
+// Maps each department to the client account it serves
+export const DEPT_ACCOUNT = {
+  Engineering: 'Account 1',
+  Design: 'Account 2',
+  Product: 'Account 3',
+  Sales: 'Account 4',
+  Finance: 'Account 5',
+  Marketing: 'Account 6',
+  Legal: 'Account 7',
+}
+
 export const initialEmployees = [
   { id: 'sm', name: 'Sophia Martínez', initials: 'SM', color: '#6366f1', dept: 'Engineering', type: 'Annual Review', status: 'In Progress', progress: 65, due: 'Dec 20, 2025', rating: null },
   { id: 'jo', name: 'James Okonkwo', initials: 'JO', color: '#7c3aed', dept: 'Design', type: 'Mid-Year Check', status: 'Awaiting Approval', progress: 100, due: 'Dec 15, 2025', rating: 4.2 },

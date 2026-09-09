@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useStore } from '../store.jsx'
 import { Card, StatCard, Avatar, Stars, Button } from '../ui.jsx'
 import { Icon } from '../icons.jsx'
-import { deptCompletion } from '../data.js'
+import { deptCompletion, DEPT_ACCOUNT } from '../data.js'
 import { exportReportsToExcel, exportReportsToPDF } from '../reportExport.js'
 
 const TOWER_HEAD_NAME = 'Juan Dela Cruz'
@@ -15,16 +15,6 @@ const DEPT_TOWER = {
   Marketing: 'Infrastructure Maintenance and Support',
   Finance: 'Infrastructure Maintenance and Support',
   Legal: 'Infrastructure Maintenance and Support',
-}
-
-const DEPT_ACCOUNT = {
-  Engineering: 'Account 1',
-  Design: 'Account 2',
-  Product: 'Account 3',
-  Sales: 'Account 4',
-  Finance: 'Account 5',
-  Marketing: 'Account 6',
-  Legal: 'Account 7',
 }
 
 function OverrideModal({ employee, onClose }) {

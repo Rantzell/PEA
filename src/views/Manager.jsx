@@ -2,10 +2,107 @@ import React from 'react'
 import { useStore } from '../store.jsx'
 import { Card, StatCard, Avatar, Badge, ProgressBar, Stars, Button } from '../ui.jsx'
 import { Icon } from '../icons.jsx'
-import { deptCompletion } from '../data.js'
+import { deptCompletion, DEPT_ACCOUNT } from '../data.js'
 import { EvaluationModal } from './EvaluationModal.jsx'
 
 const MANAGER_NAME = 'Maria Dela Cruz'
+
+function groupByAccount(employees) {
+  return employees.reduce((acc, e) => {
+    const account = DEPT_ACCOUNT[e.dept] || e.dept
+    ;(acc[account] ||= []).push(e)
+    return acc
+  }, {})
+}
+
+function AccountCardGrid({ title, employees, emptyText, tint, onOpen }) {
+  const groups = groupByAccount(employees)
+  const accounts = Object.keys(groups).sort()
+  return (
+    <Card>
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-lg font-bold">{title}</h2>
+        <span className="text-sm text-slate-400">{employees.length} total</span>
+      </div>
+      {accounts.length === 0 && <p className="py-8 text-center text-slate-400">{emptyText}</p>}
+      <div className="grid gap-4 sm:grid-cols-2">
+        {accounts.map((account) => (
+          <button
+            key={account}
+            onClick={() => onOpen(account)}
+            className="rounded-xl border border-slate-100 p-5 text-left transition hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-lg dark:border-slate-700"
+          >
+            <div className={`mb-3 flex h-10 w-10 items-center justify-center rounded-lg ${tint}`}>{Icon.users}</div>
+            <div className="font-bold leading-snug">{account}</div>
+            <div className="mt-3 flex items-end justify-between">
+              <span className="text-2xl font-extrabold">{groups[account].length}</span>
+              <span className="text-sm text-slate-400">pending</span>
+            </div>
+          </button>
+        ))}
+      </div>
+    </Card>
+  )
+}
+
+function DirectReportsAccountModal({ account, employees, onClose, onEvaluate }) {
+  const members = employees.filter((e) => (DEPT_ACCOUNT[e.dept] || e.dept) === account)
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
+      <div className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl dark:bg-slate-800" onClick={(e) => e.stopPropagation()}>
+        <div className="mb-4 flex items-start justify-between">
+          <div>
+            <h3 className="text-lg font-bold">{account}</h3>
+            <p className="text-sm text-slate-400">{members.length} direct reports pending evaluation</p>
+          </div>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-600">{Icon.x}</button>
+        </div>
+        <div className="max-h-[60vh] divide-y divide-slate-100 overflow-y-auto dark:divide-slate-700">
+          {members.length === 0 && <p className="py-8 text-center text-slate-400">No pending evaluations in this account.</p>}
+          {members.map((e) => (
+            <div key={e.id} className="flex items-center gap-4 py-4">
+              <Avatar initials={e.initials} color={e.color} />
+              <div className="w-44"><div className="font-semibold leading-tight">{e.name}</div><div className="text-xs text-slate-400">{e.dept} · {e.type}</div></div>
+              <Badge status={e.status} dot />
+              <div className="ml-auto flex items-center gap-4">
+                <div className="hidden w-28 sm:block"><ProgressBar pct={e.progress} /></div>
+                <Button onClick={() => onEvaluate(e)}>{Icon.play} {e.status === 'In Progress' ? 'Continue' : 'Start'}</Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ApprovalsAccountModal({ account, employees, onClose, onApprove }) {
+  const members = employees.filter((e) => (DEPT_ACCOUNT[e.dept] || e.dept) === account)
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
+      <div className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl dark:bg-slate-800" onClick={(e) => e.stopPropagation()}>
+        <div className="mb-4 flex items-start justify-between">
+          <div>
+            <h3 className="text-lg font-bold">{account}</h3>
+            <p className="text-sm text-slate-400">{members.length} pending approval</p>
+          </div>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-600">{Icon.x}</button>
+        </div>
+        <div className="max-h-[60vh] divide-y divide-slate-100 overflow-y-auto dark:divide-slate-700">
+          {members.length === 0 && <p className="py-8 text-center text-slate-400">No pending approvals in this account.</p>}
+          {members.map((e) => (
+            <div key={e.id} className="flex items-center gap-4 py-4">
+              <Avatar initials={e.initials} color={e.color} />
+              <div className="w-44"><div className="font-semibold leading-tight">{e.name}</div><div className="text-xs text-slate-400">{e.dept} · {e.type}</div></div>
+              {e.rating && <Stars value={e.rating} />}
+              <div className="ml-auto"><Button variant="green" onClick={() => onApprove(e.id)}>{Icon.thumb} Approve</Button></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
 
 function DeptBars() {
   return (
@@ -80,14 +177,16 @@ function TeamTable({ employees, onAct, title = 'Team Evaluations', emptyText = '
 }
 
 export function ManagerView({ view, config }) {
-  const { employees, notify } = useStore()
+  const { employees, notify, approve } = useStore()
   const [evalTarget, setEvalTarget] = React.useState(null)
+  const [openDirectAccount, setOpenDirectAccount] = React.useState(null)
+  const [openApprovalAccount, setOpenApprovalAccount] = React.useState(null)
   const onAct = { evaluate: setEvalTarget, export: () => notify('Exporting team evaluations…') }
   const attention = employees.filter((e) => ['In Progress', 'Not Started'].includes(e.status)).slice(0, 4)
 
   const isReports = view === 'Reports'
   const inProgress = employees.filter((e) => e.status === 'In Progress').length
-  const pendingApprovals = employees.filter((e) => e.status === 'Awaiting Approval').length
+  const pendingApprovalsList = employees.filter((e) => e.status === 'Awaiting Approval')
   const pendingDirectReports = employees.filter((e) => ['Not Started', 'In Progress'].includes(e.status))
   const rated = employees.filter((e) => e.rating)
   const avg = rated.length ? (rated.reduce((a, b) => a + b.rating, 0) / rated.length).toFixed(1) : '—'
@@ -111,7 +210,7 @@ export function ManagerView({ view, config }) {
           <div className="mb-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             <StatCard label="Team Completion Rate" value={`${Math.round((started / employees.length) * 100)}%`} sub={`${started}/${employees.length} started`} icon={Icon.chart} tint="bg-emerald-100 text-emerald-600" />
             <StatCard label="Pending Direct Reports Evaluation" value={pendingDirectReports.length} sub="Awaiting your evaluation" icon={Icon.clipboard} tint="bg-amber-100 text-amber-600" />
-            <StatCard label="Pending Approvals" value={pendingApprovals} sub="Action required" icon={Icon.check} tint="bg-red-100 text-brand" />
+            <StatCard label="Pending Approvals" value={pendingApprovalsList.length} sub="Action required" icon={Icon.check} tint="bg-red-100 text-brand" />
             <StatCard label="Avg Team Rating" value={avg} sub="vs 3.9 last cycle" icon={Icon.chart} tint="bg-indigo-100 text-indigo-600" />
           </div>
         </>
@@ -168,11 +267,19 @@ export function ManagerView({ view, config }) {
       {isDashboard && (
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="space-y-6 lg:col-span-2" data-tour="main">
-            <TeamTable
-              employees={employees.filter((e) => e.status === 'Awaiting Approval')}
-              onAct={onAct}
-              title="Pending Approvals"
+            <AccountCardGrid
+              title="Pending Direct Reports per Account"
+              employees={pendingDirectReports}
+              emptyText="No direct reports pending evaluation — nice work."
+              tint="bg-amber-50 text-amber-600 dark:bg-amber-900/20"
+              onOpen={setOpenDirectAccount}
+            />
+            <AccountCardGrid
+              title="Pending Approvals per Account"
+              employees={pendingApprovalsList}
               emptyText="No approvals waiting — nice work."
+              tint="bg-red-50 text-brand dark:bg-red-900/20"
+              onOpen={setOpenApprovalAccount}
             />
             <Card>
               <h2 className="mb-4 text-lg font-bold">Needs Your Attention</h2>
@@ -195,6 +302,22 @@ export function ManagerView({ view, config }) {
         </div>
       )}
       {evalTarget && <EvaluationModal employee={evalTarget} onClose={() => setEvalTarget(null)} />}
+      {openDirectAccount && (
+        <DirectReportsAccountModal
+          account={openDirectAccount}
+          employees={pendingDirectReports}
+          onClose={() => setOpenDirectAccount(null)}
+          onEvaluate={(e) => { setOpenDirectAccount(null); setEvalTarget(e) }}
+        />
+      )}
+      {openApprovalAccount && (
+        <ApprovalsAccountModal
+          account={openApprovalAccount}
+          employees={pendingApprovalsList}
+          onClose={() => setOpenApprovalAccount(null)}
+          onApprove={approve}
+        />
+      )}
     </>
   )
 }
