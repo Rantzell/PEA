@@ -5,6 +5,8 @@ import { Icon } from '../icons.jsx'
 import { deptCompletion } from '../data.js'
 import { EvaluationModal } from './EvaluationModal.jsx'
 
+const MANAGER_NAME = 'Maria Dela Cruz'
+
 function DeptBars() {
   return (
     <Card>
@@ -99,7 +101,7 @@ export function ManagerView({ view, config }) {
         <>
           <div className="mb-6 flex items-start justify-between">
             <div>
-              <h1 className="text-3xl font-extrabold tracking-tight">Manager Dashboard</h1>
+              <h1 className="text-3xl font-extrabold tracking-tight">{isReports ? 'Manager Dashboard' : MANAGER_NAME}</h1>
               <p className="mt-1 text-slate-500">
                 {isReports ? 'Full breakdown of team completion and ratings.' : "Oversee your team's performance and drive completion."}
               </p>
