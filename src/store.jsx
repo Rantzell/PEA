@@ -44,11 +44,17 @@ export function StoreProvider({ children }) {
     const e = employees.find((x) => x.id === id)
     notify(`Saved evaluation for ${e?.name} (${rating.toFixed(1)})`)
   }
+  const submitToHR = () => {
+    const ids = employees.filter((e) => e.status === 'Approved' && !e.submittedToHR).map((e) => e.id)
+    if (ids.length === 0) return
+    setEmployees((list) => list.map((e) => (ids.includes(e.id) ? { ...e, submittedToHR: true } : e)))
+    notify(`Submitted ${ids.length} evaluation${ids.length > 1 ? 's' : ''} to HR`)
+  }
 
   const value = {
     role, setRole, dark, setDark,
     employees, updateEmployee,
-    approve, reject, override, saveEvaluation,
+    approve, reject, override, saveEvaluation, submitToHR,
     toast, notify,
   }
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>
