@@ -46,7 +46,8 @@ export function TowerHeadView({ view }) {
   const [openTower, setOpenTower] = useState(null)
   const [openOverrideTower, setOpenOverrideTower] = useState(null)
   const queue = employees.filter((e) => ['Awaiting Approval', 'Awaiting Review'].includes(e.status))
-  const approvedPending = employees.filter((e) => e.status === 'Approved' && !e.submittedToHR).length
+  const approvedList = employees.filter((e) => e.status === 'Approved' && !e.submittedToHR)
+  const approvedPending = approvedList.length
   const submittedToHR = employees.filter((e) => e.status === 'Approved' && e.submittedToHR).length + 12
   const rated = employees.filter((e) => e.rating)
   const avg = rated.length ? (rated.reduce((a, b) => a + b.rating, 0) / rated.length).toFixed(1) : '—'
@@ -152,6 +153,17 @@ export function TowerHeadView({ view }) {
         <div className="my-1 text-3xl font-extrabold">{approvedPending}</div>
         <div className="text-sm text-slate-500">approved, not yet submitted to HR</div>
       </div>
+      {approvedList.length > 0 && (
+        <div className="mt-4 max-h-64 divide-y divide-slate-100 overflow-y-auto rounded-xl border border-slate-100 dark:divide-slate-700 dark:border-slate-700">
+          {approvedList.map((e) => (
+            <div key={e.id} className="flex items-center gap-3 px-3 py-3">
+              <Avatar initials={e.initials} color={e.color} size={36} />
+              <div><div className="font-semibold leading-tight">{e.name}</div><div className="text-xs text-slate-400">{e.dept} · {e.type}</div></div>
+              {e.rating && <span className="ml-auto"><Stars value={e.rating} /></span>}
+            </div>
+          ))}
+        </div>
+      )}
       <Button className="mt-4 w-full disabled:cursor-not-allowed disabled:opacity-50" disabled={approvedPending === 0} onClick={submitToHR}>{Icon.send} Submit to HR</Button>
     </Card>
   )
