@@ -14,6 +14,12 @@ export const initialEmployees = [
   { id: 'dk', name: 'David Kim', initials: 'DK', color: '#f97316', dept: 'Engineering', type: 'Annual Review', status: 'Completed', progress: 100, due: 'Nov 28, 2025', rating: 4.5 },
   { id: 'nj', name: 'Naomi Johnson', initials: 'NJ', color: '#8b5cf6', dept: 'Legal', type: 'Annual Review', status: 'Awaiting Approval', progress: 100, due: 'Dec 12, 2025', rating: 3.9 },
   { id: 'cw', name: 'Chen Wei', initials: 'CW', color: '#0ea5e9', dept: 'Finance', type: 'Annual Review', status: 'In Progress', progress: 30, due: 'Dec 20, 2025', rating: null },
+  { id: 'jd', name: 'Jan Doe', initials: 'JD', color: '#22c55e', dept: 'Engineering', type: 'Annual Review', status: 'Awaiting Approval', progress: 100, due: 'Dec 19, 2025', rating: 4.4 },
+  { id: 'mdc', name: 'Miguel Dela Cruz', initials: 'MD', color: '#eab308', dept: 'Engineering', type: 'Mid-Year Check', status: 'Awaiting Approval', progress: 100, due: 'Dec 19, 2025', rating: 3.7 },
+  { id: 'ldc', name: 'Liza Dela Cruz', initials: 'LD', color: '#d946ef', dept: 'Design', type: 'Annual Review', status: 'Awaiting Approval', progress: 100, due: 'Dec 16, 2025', rating: 4.8 },
+  { id: 'ad', name: 'Ana Doe', initials: 'AD', color: '#06b6d4', dept: 'Product', type: 'Annual Review', status: 'Awaiting Approval', progress: 100, due: 'Dec 17, 2025', rating: 4.1 },
+  { id: 'rdc', name: 'Ramon Dela Cruz', initials: 'RD', color: '#84cc16', dept: 'Sales', type: 'Probation Review', status: 'Awaiting Approval', progress: 100, due: 'Dec 11, 2025', rating: 3.2 },
+  { id: 'gd', name: 'Grace Doe', initials: 'GD', color: '#f43f5e', dept: 'Finance', type: 'Mid-Year Check', status: 'Awaiting Approval', progress: 100, due: 'Dec 21, 2025', rating: 4.0 },
 ]
 
 export const deptCompletion = [

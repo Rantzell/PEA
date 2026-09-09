@@ -16,6 +16,16 @@ const DEPT_TOWER = {
   Legal: 'Infrastructure Maintenance and Support',
 }
 
+const DEPT_ACCOUNT = {
+  Engineering: 'Account 1',
+  Design: 'Account 2',
+  Product: 'Account 3',
+  Sales: 'Account 4',
+  Finance: 'Account 5',
+  Marketing: 'Account 6',
+  Legal: 'Account 7',
+}
+
 function OverrideModal({ employee, onClose }) {
   const { override } = useStore()
   const [val, setVal] = useState(employee.rating || 3)
@@ -97,7 +107,10 @@ export function TowerHeadView({ view }) {
   }
 
   const TowerModal = ({ tower, onClose }) => {
-    const members = queue.filter((e) => (DEPT_TOWER[e.dept] || e.dept) === tower)
+    const [account, setAccount] = useState('All')
+    const allMembers = queue.filter((e) => (DEPT_TOWER[e.dept] || e.dept) === tower)
+    const accounts = [...new Set(allMembers.map((e) => DEPT_ACCOUNT[e.dept] || e.dept))].sort()
+    const members = account === 'All' ? allMembers : allMembers.filter((e) => (DEPT_ACCOUNT[e.dept] || e.dept) === account)
     const selectedIds = members.filter((e) => checked[e.id]).map((e) => e.id)
     const allSelected = members.length > 0 && selectedIds.length === members.length
     const toggleAll = () => {
@@ -125,6 +138,18 @@ export function TowerHeadView({ view }) {
             </div>
             <button onClick={onClose} className="text-slate-400 hover:text-slate-600">{Icon.x}</button>
           </div>
+          {accounts.length > 0 && (
+            <div className="mb-3">
+              <label className="mb-1 block text-xs font-bold uppercase tracking-wide text-slate-400">Account</label>
+              <select value={account} onChange={(e) => setAccount(e.target.value)}
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-brand dark:border-slate-600 dark:bg-slate-900">
+                <option value="All">All Accounts ({allMembers.length})</option>
+                {accounts.map((a) => (
+                  <option key={a} value={a}>{a} ({allMembers.filter((e) => (DEPT_ACCOUNT[e.dept] || e.dept) === a).length})</option>
+                ))}
+              </select>
+            </div>
+          )}
           {members.length > 0 && (
             <div className="mb-2 flex items-center justify-between border-b border-slate-100 pb-2 dark:border-slate-700">
               <label className="flex items-center gap-2 text-sm font-medium text-slate-500">
